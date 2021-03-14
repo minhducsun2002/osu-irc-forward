@@ -17,8 +17,8 @@ client
     .on('ready', async () => {
         log(`Logged in as ${client.user.username}#${client.user.discriminator}.`);
 
-        let channels = TARGET_CHANNELS.split(',').map(_ => _.trim())
-            .map(channelId => client.channels.cache.get(channelId)) as TextChannel[];
+        let channels = await Promise.all(TARGET_CHANNELS.split(',').map(_ => _.trim())
+            .map(channelId => client.channels.fetch(channelId).catch(console.log))) as TextChannel[];
 
         if (!channels.filter(ch => ch instanceof TextChannel).length) panic(`There's no valid channel ID to push tracked messages to!`);
         let dispatchChannels = channels.filter(ch => ch instanceof TextChannel);
@@ -40,11 +40,6 @@ client
             .on('connected', async () => {
                 log(`Logged into Bancho successfully as ${bancho.getSelf().ircUsername}`);
                 let self = await bancho.getSelf().fetchFromAPI();
-                for (let channel of dispatchChannels) channel.send(
-                    new MessageEmbed()
-                        .setAuthor(`${self.username}`, `https://a.ppy.sh/${self.id}`)
-                        .setDescription(`Logged into Bancho under the username \`${bancho.getSelf().ircUsername}\`.`)
-                );
 
                 // joining channels
                 for (let ch of TRACKED_CHANNELS.split(',').map(_ => _.trim()).filter(Boolean).slice(0, 1))
