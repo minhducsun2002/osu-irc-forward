@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "lib": ["ES2019.Array"],
+        "allowJs": false,
+        "alwaysStrict": true,
+        "declaration": false,
+        "listEmittedFiles": true,
+        "noImplicitAny": true,
+        "outDir": "dist/",
+        "types": ["node"],
+        "target": "ES6",
+        "esModuleInterop": true,
+        "emitDecoratorMetadata": false,
+        "incremental": true,
+        "tsBuildInfoFile": "./.tsbuildinfo",
+        "downlevelIteration": true,
+        "baseUrl": "."
+    },
+    "include": ["src/**/*"]
+}
