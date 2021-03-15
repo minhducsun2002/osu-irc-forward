@@ -1,6 +1,7 @@
 import { BanchoClient } from 'bancho.js';
-import { Client, MessageEmbed, TextChannel } from 'discord.js';
+import { Client, TextChannel } from 'discord.js';
 import { config } from 'dotenv'; config();
+import safe from 'url-regex-safe';
 
 const { IRC_USERNAME, IRC_PASSWORD, TARGET_CHANNELS, TRACKED_CHANNELS, DISCORD_TOKEN, OSU_API_KEY } = process.env;
 const bancho = new BanchoClient({ username: IRC_USERNAME, password: IRC_PASSWORD, apiKey: OSU_API_KEY });
@@ -45,10 +46,12 @@ client
                 for (let ch of TRACKED_CHANNELS.split(',').map(_ => _.trim()).filter(Boolean).slice(0, 1))
                     bancho.getChannel(ch.trim()).join().catch(() => null)
                 bancho.on('CM', msg => {
-                    let action = (msg as any).getAction();
-                    for (let channel of dispatchChannels) channel.send(`[${msg.user.ircUsername}] ${
-                        (action ? `(*)` : '') + msg.message.replace('ACTION', '').trimStart()
-                    }`);
+                    let action = msg.getAction();
+                    let { message } = msg;
+                    if (action) message = message.replace('ACTION', '').trimStart();
+                    // sanitize urls
+                    for (let match of message.match(safe()) || []) message = message.replace(match, `<${match}>`);
+                    for (let channel of dispatchChannels) channel.send(`[${msg.user.ircUsername}] ${(action ? `(*)` : '')}${message.trimStart()}`);
                 });
                 log(`Registered handlers to forward messages.`)
             })
