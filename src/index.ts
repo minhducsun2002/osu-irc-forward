@@ -47,7 +47,7 @@ client
                 bancho.on('CM', msg => {
                     let action = (msg as any).getAction();
                     for (let channel of dispatchChannels) channel.send(`[${msg.user.ircUsername}] ${
-                        (action ? `(*)` : '') + msg.message
+                        (action ? `(*)` : '') + msg.message.replace('ACTION', '').trimStart()
                     }`);
                 });
                 log(`Registered handlers to forward messages.`)
