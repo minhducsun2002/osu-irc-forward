@@ -37,27 +37,27 @@ client
         }
 
         log(`Initializing Bancho client.`);
-        if (!bancho.isConnected)
-            bancho
-                .on('connected', async () => {
-                    log(`Logged into Bancho successfully as ${bancho.getSelf().ircUsername}`);
-                    let self = await bancho.getSelf().fetchFromAPI();
+        bancho.disconnect();
+        bancho.removeAllListeners('connected');
+        bancho
+            .on('connected', async () => {
+                log(`Logged into Bancho successfully as ${bancho.getSelf().ircUsername}`);
+                let self = await bancho.getSelf().fetchFromAPI();
 
-                    // joining channels
-                    for (let ch of TRACKED_CHANNELS.split(',').map(_ => _.trim()).filter(Boolean).slice(0, 1))
-                        bancho.getChannel(ch.trim()).join().catch(() => null)
-                    bancho.on('CM', msg => {
-                        let action = msg.getAction();
-                        let { message } = msg;
-                        if (action) message = message.replace('ACTION', '').trimStart();
-                        // sanitize urls
-                        for (let match of message.match(safe()) || []) message = message.replace(match, `<${match}>`);
-                        for (let channel of dispatchChannels) channel.send(`[${msg.user.ircUsername}] ${(action ? `(*)` : '')}${message.trimStart()}`);
-                    });
-                    log(`Registered handlers to forward messages.`)
-                })
-                .connect().catch(e => panic(e));
-        else log(`Already connected to Bancho. Skipping initialization.`)
+                // joining channels
+                for (let ch of TRACKED_CHANNELS.split(',').map(_ => _.trim()).filter(Boolean).slice(0, 1))
+                    bancho.getChannel(ch.trim()).join().catch(() => null)
+                bancho.on('CM', msg => {
+                    let action = msg.getAction();
+                    let { message } = msg;
+                    if (action) message = message.replace('ACTION', '').trimStart();
+                    // sanitize urls
+                    for (let match of message.match(safe()) || []) message = message.replace(match, `<${match}>`);
+                    for (let channel of dispatchChannels) channel.send(`[${msg.user.ircUsername}] ${(action ? `(*)` : '')}${message.trimStart()}`);
+                });
+                log(`Registered handlers to forward messages.`)
+            })
+            .connect().catch(e => panic(e));
     })
     .login(DISCORD_TOKEN)
     .catch(e => panic(e));
