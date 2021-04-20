@@ -15,7 +15,7 @@ function panic(error? : string) { if (error) console.error(error); process.exit(
 function log(s : string) { console.log(`${new Date().toJSON()} | ${s}`); }
 
 client
-    .on('ready', async () => {
+    .once('ready', async () => {
         log(`Logged in as ${client.user.username}#${client.user.discriminator}.`);
 
         let channels = await Promise.all(TARGET_CHANNELS.split(',').map(_ => _.trim())
@@ -40,7 +40,7 @@ client
         bancho.disconnect();
         bancho.removeAllListeners('connected');
         bancho
-            .on('connected', async () => {
+            .once('connected', async () => {
                 log(`Logged into Bancho successfully as ${bancho.getSelf().ircUsername}`);
                 let self = await bancho.getSelf().fetchFromAPI();
 
