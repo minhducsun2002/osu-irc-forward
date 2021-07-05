@@ -79,7 +79,7 @@ export class Inhibitor {
                 { upsert: true, new: true }
             ).exec().then(record => {
                 this.cache.set(record.username, record);
-                m.reply(`Allowed user ${record.username} to ${out}.`);
+                m.reply(`Allowed user \`${record.username}\` to ${out}.`);
             })
         }
     }
