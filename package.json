@@ -8,7 +8,7 @@
   "private": true,
   "dependencies": {
     "@types/mongoose": "5.10.1",
-    "@types/node": "^16.0.0",
+    "@types/node": "^14.14.34",
     "@types/url-regex-safe": "^1.0.0",
     "bancho.js": "0.10.0-rc.4",
     "discord-akairo": "^8.1.0",
