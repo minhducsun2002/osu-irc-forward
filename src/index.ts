@@ -59,7 +59,7 @@ client
 
                     message = message.replace(/@everyone/g, 'at-everyone').replace(/@here/g, 'at-here');
 
-                    let option = inhibitor.cache.get(msg.user.ircUsername) ?? { allowIndividualMention: false, allowRoleMention: false };
+                    let option = inhibitor.cache.get(msg.user.ircUsername.toLowerCase()) ?? { allowIndividualMention: false, allowRoleMention: false };
 
                     if (!option.allowIndividualMention)
                         message = message.replace(MessageMentions.USERS_PATTERN, 'at-user-$1')

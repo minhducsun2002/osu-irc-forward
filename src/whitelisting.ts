@@ -52,6 +52,7 @@ export class Inhibitor {
         let [username, option] = pieces;
         if (username)
         {
+            username = username.toLowerCase();
             let options = { username } as WhitelistingEntry;
             let out = 'do nothing';
             switch (option) {
