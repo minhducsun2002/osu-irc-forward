@@ -53,6 +53,7 @@ client
                     if (action) message = message.replace('ACTION', '').trimStart();
                     // sanitize urls
                     for (let match of message.match(safe()) || []) message = message.replace(match, `<${match}>`);
+                    message = message.replace(/@everyone/g, 'at-everyone');
                     for (let channel of dispatchChannels) channel.send(`[${msg.user.ircUsername}] ${(action ? `(*)` : '')}${message.trimStart()}`);
                 });
                 log(`Registered handlers to forward messages.`)
