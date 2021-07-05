@@ -41,8 +41,8 @@ export class Inhibitor {
         if (!this.ownerID)
             this.ownerID = await m.client.fetchApplication().then(app => (app.owner as User).id);
 
-        const { content, member, author } = m, { PREFIX } = process.env;
-        if (!content.startsWith(PREFIX)) return;
+        const { content, member, author } = m, { BOT_PREFIX } = process.env;
+        if (!content.startsWith(BOT_PREFIX)) return;
         if (
             (!member?.permissions.has(Permissions.FLAGS.ADMINISTRATOR))
             && (!(author.id === this.ownerID))
