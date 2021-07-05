@@ -1,7 +1,8 @@
 import { BanchoClient } from 'bancho.js';
-import { Client, TextChannel } from 'discord.js';
+import { Client, TextChannel, MessageMentions } from 'discord.js';
 import { config } from 'dotenv'; config();
 import safe from 'url-regex-safe';
+import { Inhibitor } from './whitelisting';
 
 const { IRC_USERNAME, IRC_PASSWORD, TARGET_CHANNELS, TRACKED_CHANNELS, DISCORD_TOKEN, OSU_API_KEY } = process.env;
 const bancho = new BanchoClient({ username: IRC_USERNAME, password: IRC_PASSWORD, apiKey: OSU_API_KEY });
@@ -10,6 +11,8 @@ const client = new Client({
     messageCacheLifetime: 1,
     messageSweepInterval: 1
 });
+
+const inhibitor = new Inhibitor(client);
 
 function panic(error? : string) { if (error) console.error(error); process.exit(1); }
 function log(s : string) { console.log(`${new Date().toJSON()} | ${s}`); }
@@ -53,7 +56,17 @@ client
                     if (action) message = message.replace('ACTION', '').trimStart();
                     // sanitize urls
                     for (let match of message.match(safe()) || []) message = message.replace(match, `<${match}>`);
-                    message = message.replace(/@everyone/g, 'at-everyone');
+
+                    message = message.replace(/@everyone/g, 'at-everyone').replace(/@here/g, 'at-here');
+
+                    let option = inhibitor.cache.get(msg.user.ircUsername) ?? { allowIndividualMention: false, allowRoleMention: false };
+
+                    if (!option.allowIndividualMention)
+                        message = message.replace(MessageMentions.USERS_PATTERN, 'at-user-$1')
+
+                    if (!option.allowRoleMention)
+                        message = message.replace(MessageMentions.ROLES_PATTERN, 'at-role-$1')
+
                     for (let channel of dispatchChannels) channel.send(`[${msg.user.ircUsername}] ${(action ? `(*)` : '')}${message.trimStart()}`);
                 });
                 log(`Registered handlers to forward messages.`)
