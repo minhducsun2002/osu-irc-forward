@@ -1,5 +1,5 @@
 import { BanchoClient } from 'bancho.js';
-import { Client, TextChannel, MessageMentions } from 'discord.js';
+import { Client, TextChannel, MessageMentions, Intents } from 'discord.js';
 import { config } from 'dotenv'; config();
 import safe from 'url-regex-safe';
 import { Inhibitor } from './whitelisting';
@@ -7,9 +7,14 @@ import { Inhibitor } from './whitelisting';
 const { IRC_USERNAME, IRC_PASSWORD, TARGET_CHANNELS, TRACKED_CHANNELS, DISCORD_TOKEN, OSU_API_KEY } = process.env;
 const bancho = new BanchoClient({ username: IRC_USERNAME, password: IRC_PASSWORD, apiKey: OSU_API_KEY });
 const client = new Client({
-    messageCacheMaxSize: 0,
-    messageCacheLifetime: 1,
-    messageSweepInterval: 1
+    sweepers: {
+        messages: {
+            lifetime: 1,
+            interval: 1
+        }
+    },
+    restSweepInterval: 1,
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]
 });
 
 const inhibitor = new Inhibitor(client);

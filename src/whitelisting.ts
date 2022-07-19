@@ -39,7 +39,7 @@ export class Inhibitor {
 
     async messageHandler(m : Message) {
         if (!this.ownerID)
-            this.ownerID = await m.client.fetchApplication().then(app => (app.owner as User).id);
+            this.ownerID = await m.client.application.fetch().then(a => a.owner.id);
 
         const { content, member, author } = m, { BOT_PREFIX } = process.env;
         if (!content.startsWith(BOT_PREFIX)) return;
